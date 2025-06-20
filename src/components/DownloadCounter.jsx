@@ -63,7 +63,7 @@ const DownloadCounter = ({ showLabel = true, compact = false }) => {
     const intervalId = setInterval(() => {
       // console.log('Refreshing download stats...');
       loadDownloadStats(false); // Force fresh data
-    }, 300000);
+    }, 3600000);
 
     // Cleanup interval on unmount
     return () => clearInterval(intervalId);
