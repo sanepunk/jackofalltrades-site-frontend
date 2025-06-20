@@ -62,7 +62,7 @@ const DownloadCounter = ({ showLabel = true, compact = false }) => {
     // Set up automatic refresh every 2 minutes (respecting API rate limits)
     const intervalId = setInterval(() => {
       loadDownloadStats(false); // Force fresh data
-    }, 120000);
+    }, 300000);
 
     // Cleanup interval on unmount
     return () => clearInterval(intervalId);
