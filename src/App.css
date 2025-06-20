@@ -1190,6 +1190,25 @@ p {
   .model-tags {
     justify-content: center !important;
   }
+  
+  /* Download counter mobile styles */
+  .download-counter-wrapper {
+    margin: 2rem auto 0 !important;
+  }
+  
+  .download-counter {
+    padding: 1rem !important;
+  }
+  
+  .download-header {
+    flex-direction: column !important;
+    text-align: center !important;
+    gap: 0.5rem !important;
+  }
+  
+  .download-number {
+    font-size: 2rem !important;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1289,6 +1308,193 @@ p {
 
 .fade-in-up {
   animation: fadeInUp 0.6s ease-out;
+}
+
+/* Download Counter Styles */
+.download-counter {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.download-counter:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.download-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.download-icon-wrapper {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.download-icon {
+  color: white;
+}
+
+.download-info {
+  flex: 1;
+}
+
+.download-info h3 {
+  margin: 0;
+  font-size: 1.2rem;
+  color: #2d3748;
+}
+
+.last-updated {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #718096;
+}
+
+.refresh-btn {
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.download-stats {
+  text-align: center;
+}
+
+.download-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #718096;
+}
+
+.loading-spinner {
+  width: 24px;
+  height: 24px;
+  border: 2px solid #e2e8f0;
+  border-top: 2px solid #667eea;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.download-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  color: #e53e3e;
+}
+
+.retry-btn {
+  background: #e53e3e;
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.retry-btn:hover {
+  background: #c53030;
+}
+
+.download-number-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.download-number {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.download-raw {
+  font-size: 0.9rem;
+  color: #718096;
+}
+
+.download-error-details {
+  margin-top: 0.5rem;
+  text-align: center;
+}
+
+.download-error-details small {
+  color: #e53e3e;
+  font-size: 0.75rem;
+}
+
+/* Compact Download Counter */
+.download-counter-compact {
+  display: inline-flex;
+  align-items: center;
+}
+
+.download-stats-compact {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 0.75rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.download-icon-compact {
+  color: #667eea;
+}
+
+.download-number-compact {
+  font-weight: 600;
+  color: #2d3748;
+  font-size: 1rem;
+}
+
+.download-label-compact {
+  color: #718096;
+  font-size: 0.9rem;
+}
+
+/* Download Counter Wrapper */
+.download-counter-wrapper {
+  max-width: 400px;
+  margin: 3rem auto 0;
 }
 
 /* Utility classes */

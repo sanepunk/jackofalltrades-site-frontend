@@ -11,6 +11,7 @@ import {
   Users,
   Mail
 } from 'lucide-react'
+import DownloadCounter from '../components/DownloadCounter'
 
 const HomePage = () => {
   const features = [
@@ -50,7 +51,7 @@ const HomePage = () => {
     { number: "10+", label: "ML Models" },
     { number: "5+", label: "Datasets" },
     { number: "15+", label: "Metrics" },
-    { number: "100%", label: "Open Source" }
+    // { number: "100%", label: "Open Source" }
   ]
 
   const quickStartCode = `# Install jackofalltrades
@@ -116,6 +117,11 @@ print(f"RMSE: {evaluator.RMSE():.3f}")`
                 <div className="stat-label">{stat.label}</div>
               </div>
             ))}
+          </div>
+          
+          {/* Download Counter */}
+          <div className="download-counter-wrapper">
+            <DownloadCounter />
           </div>
         </div>
       </section>
