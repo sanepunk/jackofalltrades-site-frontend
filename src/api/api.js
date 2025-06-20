@@ -52,7 +52,7 @@ export const fetchDownloadStats = async () => {
     
     // Make request to our FastAPI backend instead of directly to Pepy.tech
     const response = await axios.get(`${BACKEND_URL}/api/downloads`, {
-      timeout: 15000,
+      timeout: 59900,
       headers: {
         'Content-Type': 'application/json',
       }
