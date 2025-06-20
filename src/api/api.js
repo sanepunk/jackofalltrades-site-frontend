@@ -42,11 +42,11 @@ api.interceptors.response.use(
 
 /**
  * Fetch project download statistics
- * @returns {Promise<Object>} Project download data
+//  * @returns {Promise<Object>} Project download data
  */
 export const fetchDownloadStats = async () => {
   try {
-    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8000';
+    const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
     
     // console.log('Fetching download stats from FastAPI backend...');
     
