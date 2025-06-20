@@ -61,7 +61,7 @@ const DownloadCounter = ({ showLabel = true, compact = false }) => {
 
     // Set up automatic refresh every 2 minutes (respecting API rate limits)
     const intervalId = setInterval(() => {
-      console.log('Refreshing download stats...');
+      // console.log('Refreshing download stats...');
       loadDownloadStats(false); // Force fresh data
     }, 300000);
 
