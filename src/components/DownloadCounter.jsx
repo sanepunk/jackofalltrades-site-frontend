@@ -1,76 +1,109 @@
 import { useState, useEffect } from 'react';
-import { Download, TrendingUp, RefreshCw } from 'lucide-react';
-import { fetchDownloadStats, formatDownloads, getCachedStats, cacheStats } from '../api/api';
+import { Download, TrendingUp, RefreshCw, Clock, Wifi, WifiOff } from 'lucide-react';
+import { fetchDownloadStats, formatDownloads, getCachedStats, shouldRefreshCache, clearCache } from '../api/api';
 
 const DownloadCounter = ({ showLabel = true, compact = false }) => {
   const [downloads, setDownloads] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [isBackgroundLoading, setIsBackgroundLoading] = useState(false);
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
+  const [cacheInfo, setCacheInfo] = useState(null);
+  const [usingFallbackCache, setUsingFallbackCache] = useState(false);
 
-  const loadDownloadStats = async (useCache = true) => {
+  const loadDownloadStats = async (forceRefresh = false) => {
     try {
-      setIsLoading(true);
       setError(null);
-
-      // Try to get cached data first
-      if (useCache) {
-        const cached = getCachedStats();
-        if (cached && cached.success) {
-          setDownloads(cached.totalDownloads);
-          setLastUpdated(cached.lastUpdated);
-          setIsLoading(false);
-          return;
-        }
+      setUsingFallbackCache(false);
+      
+      if (forceRefresh) {
+        setIsLoading(true);
       }
 
-      // Fetch fresh data
-      const stats = await fetchDownloadStats();
+      const stats = await fetchDownloadStats({
+        bypassCache: forceRefresh,
+        
+        // Callback when cached data is used (instant display)
+        onCacheUsed: (cachedData) => {
+          setDownloads(cachedData.totalDownloads);
+          setLastUpdated(cachedData.lastUpdated);
+          setCacheInfo(cachedData.cacheStatus);
+          setIsLoading(false);
+          
+          // If cache is stale, show background loading indicator
+          if (cachedData.cacheStatus.isStale) {
+            setIsBackgroundLoading(true);
+          }
+        },
+        
+        // Callback when fresh fetch starts
+        onFetchStart: () => {
+          if (!forceRefresh) {
+            setIsBackgroundLoading(true);
+          }
+        }
+      });
       
       if (stats.success) {
         setDownloads(stats.totalDownloads);
         setLastUpdated(stats.lastUpdated);
-        cacheStats(stats); // Cache the results
+        setCacheInfo(stats.cacheStatus || null);
+        setUsingFallbackCache(!!stats.usingFallbackCache);
+        
+        if (stats.usingFallbackCache) {
+          setError(stats.error);
+        }
       } else {
         setError(stats.error);
-        // Use cached data as fallback if available
-        const cached = getCachedStats();
-        if (cached) {
-          setDownloads(cached.totalDownloads);
-          setLastUpdated(cached.lastUpdated);
+        // The API already handles fallback cache internally
+        if (stats.totalDownloads > 0) {
+          setDownloads(stats.totalDownloads);
+          setLastUpdated(stats.lastUpdated);
+          setUsingFallbackCache(true);
         }
       }
     } catch (err) {
       console.error('Error loading download stats:', err);
       setError(err.message);
       
-      // Use cached data as fallback
-      const cached = getCachedStats();
+      // Try to get any cached data as final fallback
+      const cached = getCachedStats(true);
       if (cached) {
         setDownloads(cached.totalDownloads);
         setLastUpdated(cached.lastUpdated);
+        setCacheInfo(cached.cacheStatus);
+        setUsingFallbackCache(true);
       }
     } finally {
       setIsLoading(false);
+      setIsBackgroundLoading(false);
     }
   };
 
   useEffect(() => {
-    // Initial load
+    // Initial load - this will show cached data instantly if available
     loadDownloadStats();
 
-    // Set up automatic refresh every 2 minutes (respecting API rate limits)
+    // Set up automatic background refresh based on cache status
     const intervalId = setInterval(() => {
-      // console.log('Refreshing download stats...');
-      loadDownloadStats(false); // Force fresh data
-    }, 3600000);
+      // Only refresh if cache is stale or doesn't exist
+      if (shouldRefreshCache()) {
+        console.log('🔄 Auto-refreshing stale cache...');
+        loadDownloadStats(false); // Don't force refresh, let it use cache strategy
+      }
+    }, 5 * 60 * 1000); // Check every 5 minutes
 
     // Cleanup interval on unmount
     return () => clearInterval(intervalId);
   }, []);
 
   const handleRefresh = () => {
-    loadDownloadStats(false);
+    loadDownloadStats(true); // Force refresh
+  };
+
+  const handleClearCache = () => {
+    clearCache();
+    loadDownloadStats(true); // Force fresh fetch
   };
 
   const formatLastUpdated = (timestamp) => {
@@ -112,17 +145,39 @@ const DownloadCounter = ({ showLabel = true, compact = false }) => {
           {lastUpdated && (
             <p className="last-updated">
               Updated {formatLastUpdated(lastUpdated)}
+              {cacheInfo && (
+                <span className={`cache-status ${cacheInfo.isFresh ? 'fresh' : 'stale'}`}>
+                  {cacheInfo.isFresh ? ' • Fresh' : ' • Cached'}
+                  {usingFallbackCache && ' • Offline'}
+                </span>
+              )}
             </p>
           )}
         </div>
-        <button 
-          onClick={handleRefresh} 
-          className="refresh-btn"
-          disabled={isLoading}
-          title="Refresh download stats"
-        >
-          <RefreshCw size={16} className={isLoading ? 'spinning' : ''} />
-        </button>
+        <div className="download-actions">
+          {isBackgroundLoading && (
+            <div className="background-loading" title="Updating in background...">
+              <Wifi size={14} className="spinning" />
+            </div>
+          )}
+          <button 
+            onClick={handleRefresh} 
+            className="refresh-btn"
+            disabled={isLoading}
+            title="Force refresh download stats"
+          >
+            <RefreshCw size={16} className={isLoading ? 'spinning' : ''} />
+          </button>
+          {cacheInfo && (
+            <button 
+              onClick={handleClearCache}
+              className="clear-cache-btn"
+              title="Clear cache and refresh"
+            >
+              <Clock size={14} />
+            </button>
+          )}
+        </div>
       </div>
       
       <div className="download-stats">
@@ -133,9 +188,12 @@ const DownloadCounter = ({ showLabel = true, compact = false }) => {
           </div>
         ) : error ? (
           <div className="download-error">
-            <span>Failed to load stats</span>
+            <span>
+              {usingFallbackCache ? 'Using cached data' : 'Failed to load stats'}
+              {usingFallbackCache && <WifiOff size={16} />}
+            </span>
             <button onClick={handleRefresh} className="retry-btn">
-              Retry
+              {usingFallbackCache ? 'Try Again' : 'Retry'}
             </button>
           </div>
         ) : (
@@ -148,7 +206,15 @@ const DownloadCounter = ({ showLabel = true, compact = false }) => {
       
       {error && (
         <div className="download-error-details">
-          <small>Using cached data. Error: {error}</small>
+          <small>
+            {usingFallbackCache 
+              ? `Showing cached data. ${error}` 
+              : `Error: ${error}`
+            }
+            {cacheInfo && usingFallbackCache && (
+              <span> (Cache age: {cacheInfo.ageFormatted})</span>
+            )}
+          </small>
         </div>
       )}
     </div>

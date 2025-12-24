@@ -737,6 +737,10 @@ p {
   to { transform: rotate(360deg); }
 }
 
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
 /* Installation Steps */
 .installation-steps {
   display: flex;
@@ -1382,6 +1386,64 @@ p {
 .refresh-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+/* Enhanced Download Counter Actions */
+.download-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.background-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #667eea;
+  opacity: 0.7;
+}
+
+.clear-cache-btn {
+  background: transparent;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #718096;
+}
+
+.clear-cache-btn:hover {
+  background: #f7fafc;
+  border-color: #cbd5e0;
+  color: #4a5568;
+}
+
+/* Cache Status Indicators */
+.cache-status {
+  font-weight: 500;
+}
+
+.cache-status.fresh {
+  color: #38a169;
+}
+
+.cache-status.stale {
+  color: #d69e2e;
+}
+
+/* Enhanced Error States */
+.download-error span {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.download-error-details span {
+  color: #d69e2e;
 }
 
 .download-stats {
