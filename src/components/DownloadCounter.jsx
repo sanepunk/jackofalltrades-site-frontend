@@ -186,35 +186,46 @@ const DownloadCounter = ({ showLabel = true, compact = false }) => {
             <div className="loading-spinner"></div>
             <span>Loading...</span>
           </div>
-        ) : error ? (
+        ) : error && !usingFallbackCache ? (
           <div className="download-error">
-            <span>
-              {usingFallbackCache ? 'Using cached data' : 'Failed to load stats'}
-              {usingFallbackCache && <WifiOff size={16} />}
-            </span>
+            <span>Failed to load stats</span>
             <button onClick={handleRefresh} className="retry-btn">
-              {usingFallbackCache ? 'Try Again' : 'Retry'}
+              Retry
             </button>
           </div>
         ) : (
           <div className="download-number-wrapper">
             <span className="download-number">{formatDownloads(downloads)}</span>
             <span className="download-raw">({downloads.toLocaleString()})</span>
+            {usingFallbackCache && (
+              <div className="offline-indicator">
+                <WifiOff size={14} />
+                <span>Offline mode</span>
+              </div>
+            )}
           </div>
         )}
       </div>
       
       {error && (
-        <div className="download-error-details">
+        <div className={usingFallbackCache ? "download-offline-info" : "download-error-details"}>
           <small>
             {usingFallbackCache 
-              ? `Showing cached data. ${error}` 
+              ? `Server temporarily unavailable. Showing cached data from ${cacheInfo?.ageFormatted || 'earlier'}.`
               : `Error: ${error}`
             }
-            {cacheInfo && usingFallbackCache && (
-              <span> (Cache age: {cacheInfo.ageFormatted})</span>
-            )}
           </small>
+          {usingFallbackCache && (
+            <button 
+              onClick={handleRefresh} 
+              className="reconnect-btn"
+              disabled={isLoading}
+              title="Try to reconnect to server"
+            >
+              <Wifi size={12} />
+              Reconnect
+            </button>
+          )}
         </div>
       )}
     </div>
